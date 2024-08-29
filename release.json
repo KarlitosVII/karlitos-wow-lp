@@ -1,6 +1,7 @@
 {
     "releases": [
         {
+            "name":"Leatrix Plus",
             "filename": "Leatrix_Plus-11.0.01",
             "nolib": false,
             "metadata": [
