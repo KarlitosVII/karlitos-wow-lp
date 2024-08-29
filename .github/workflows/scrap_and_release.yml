@@ -128,19 +128,12 @@ jobs:
             '.releases[0].version |= $VERSION | .releases[0].filename |= $FILENAME | .releases[0].metadata[0].interface |= $INTERFACE' release.json)" \
             && echo "${temp}" > release.json
 
-      - name: Make Tag
-        if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
-        id: make-tag
-        run: |
-          version=$(echo $CURSE_FILENAME | sed 's/.*-\(.*\)-.*/\1/')
-          echo "tag=${version}" >> "$GITHUB_OUTPUT"
-        
       - name: Make Release
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.make-tag.outputs.tag }}
-          name: ${{ steps.make-tag.outputs.tag }}
+          tag: ${{ steps.get_addon_version.outputs.get_addon_version }}
+          name: ${{ steps.get_addon_version.outputs.get_addon_version }}
           makeLatest: true     
           draft: false
           prerelease: false
