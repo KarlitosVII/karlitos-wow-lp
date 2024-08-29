@@ -5,7 +5,7 @@
 #
 # The reason for all of this is because LeatrixPlus is not hosted on a public repo nor does it have a relase.json
 
-name: scrap_and_release
+name: Scrap & Release
 
 # Controls when the workflow will run
 on:
@@ -102,22 +102,29 @@ jobs:
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         run: unzip ${CURSE_FILENAME}.zip
 
+      - name: Get Addon Version
+        id: get_addon_version
+        if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
+        run: |
+          cd Leatrix_Plus/
+          echo "get_addon_version=$(cat *.toc | sed -n -E -e 's/^## Version: ([a-zA-Z0-9.-]+).*/\1/p')" >> "$GITHUB_OUTPUT"
+
       - name: Get Interface Version Number
         id: get_interface_version_num
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         run: |
-          cd Leatrix_Plus/
           echo "get_interface_version_num=$(cat *.toc | sed -n -E -e 's/^## Interface: ([0-9]+).*/\1/p')" >> "$GITHUB_OUTPUT"
 
       - name: Update release.json
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         env:
+          NEW_VERSION: ${{ steps.get_addon_version.outputs.get_addon_version }}
           NEW_INTERFACE: ${{ steps.get_interface_version_num.outputs.get_interface_version_num }}
         run: |
           FULLFILE_NAME="${CURSE_FILENAME}.zip"
           temp="$(\
-            jq --arg FILENAME "$FULLFILE_NAME" --argjson INTERFACE "$NEW_INTERFACE" \
-            '.releases[0].filename |= $FILENAME | .releases[0].metadata[0].interface |= $INTERFACE' release.json)" \
+            jq --arg VERSION "$NEW_VERSION" --arg FILENAME "$FULLFILE_NAME" --argjson INTERFACE "$NEW_INTERFACE" \
+            '.releases[0].version |= $VERSION | .releases[0].filename |= $FILENAME | .releases[0].metadata[0].interface |= $INTERFACE' release.json)" \
             && echo "${temp}" > release.json
 
       - name: Make Tag
