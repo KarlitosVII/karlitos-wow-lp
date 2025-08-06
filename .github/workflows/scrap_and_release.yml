@@ -56,7 +56,7 @@ jobs:
         id: curl-curseforge
         run: |
           curl -H 'Accept: application/json' \
-            'https://www.curseforge.com/api/v1/mods/94855/files?pageIndex=0&pageSize=10&sort=dateCreated&sortDescending=true&removeAlphas=true' \
+            'https://www.curseforge.com/api/v1/mods/94855/files?pageIndex=0&pageSize=10&sort=dateCreated&sortDescending=true&removeAlphas=true&gameVersionTypeId=517' \
             -o curse-response.json
           fileNameRaw=$(cat curse-response.json | jq -r '.data[0].fileName')
           fileNameFixed=${fileNameRaw%.*}
@@ -107,14 +107,14 @@ jobs:
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         run: |
           cd Leatrix_Plus/
-          echo "get_addon_version=$(cat *.toc | sed -n -E -e 's/^## Version: ([a-zA-Z0-9.-]+).*/\1/p')" >> "$GITHUB_OUTPUT"
+          echo "get_addon_version=$(cat Leatrix_Plus.toc | sed -n -E -e 's/^## Version: ([a-zA-Z0-9.-]+).*/\1/p')" >> "$GITHUB_OUTPUT"
 
       - name: Get Interface Version Number
         id: get_interface_version_num
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
         run: |
           cd Leatrix_Plus/
-          echo "get_interface_version_num=$(cat *.toc | sed -n -E -e 's/^## Interface: ([0-9]+).*/\1/p')" >> "$GITHUB_OUTPUT"
+          echo "get_interface_version_num=$(cat Leatrix_Plus.toc | sed -n -E -e 's/^## Interface: ([0-9]+).*/\1/p')" >> "$GITHUB_OUTPUT"
 
       - name: Update release.json
         if: ${{ env.MY_FILENAME != env.CURSE_FILENAME }}
